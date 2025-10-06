@@ -71,12 +71,12 @@ In VSCode `mcp.json` you should have the following:
 
 ```sh
 {
-	"servers": {
-		"openroute-mcp": {
-			"url": "http://localhost:8888/mcp",
-			"type": "http"
-		}
-	}
+  "servers": {
+    "openroute-mcp-http": {
+      "url": "http://localhost:8888/mcp",
+      "type": "http"
+    }
+  }
 }
 ```
 
@@ -86,11 +86,11 @@ In VSCode `mcp.json` you should have the following:
 >
 > You can click the wrench and screwdriver button 🛠️ (`Select Tools...`) to enable/disable specific tools
 
-> More details available in [the official docs](https://code.visualstudio.com/docs/copilot/chat/mcp-servers).
-
 > [!CAUTION]
 >
 > The routes created on a public MCP server will be publicly available to anyone.
+
+> More details available in [the VSCode MCP official docs](https://code.visualstudio.com/docs/copilot/chat/mcp-servers).
 
 ### ⌨️ Use stdio transport
 
@@ -106,19 +106,19 @@ In VSCode `mcp.json` file you should have:
 
 ```json
 {
-	"servers": {
-		"openroute-mcp": {
-			"type": "stdio",
-			"command": "uvx",
-			"args": [
-				"openroute-mcp",
+  "servers": {
+    "openroute-mcp": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "openroute-mcp",
         "--stdio"
-			],
+      ],
       "env": {
         "OPENROUTESERVICE_API_KEY": "YOUR_API_KEY"
-    	}
-		}
-	}
+      }
+    }
+  }
 }
 ```
 

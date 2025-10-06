@@ -299,7 +299,7 @@ def get_route(filename: str) -> bytes:
 def cli() -> None:
     """Run the MCP server."""
     parser = argparse.ArgumentParser(
-        description="A Model Context Protocol (MCP) server for building routes using OpenRouteServices."
+        description="A Model Context Protocol (MCP) server for building routes using OpenRouteService."
     )
     parser.add_argument("--stdio", action="store_true", help="Use STDIO transport")
     parser.add_argument("--port", type=int, default=8888, help="Port to run the server on")

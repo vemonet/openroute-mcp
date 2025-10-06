@@ -54,29 +54,29 @@ Or with stdio:
 uv run --env-file .env openroute-mcp --stdio
 ```
 
-🔌 Connect a client to the MCP server (cf. `README.md` for more details), the VSCode `mcp.json` should look like:
+🔌 Connect a client to the MCP server (cf. `README.md` for more details), the VSCode `mcp.json` should look like below, you will need to change the `cwd` field to provide the path to this repository on your machine:
 
 ```json
 {
-	"servers": {
-		"openroute-mcp": {
-			"type": "stdio",
-			"command": "uv",
-			"args": [
-        "run",
-				"openroute-mcp",
-        "--stdio"
-			],
-      "env": {
-        "OPENROUTESERVICE_API_KEY": "YOUR_API_KEY"
-    	},
-      "cwd": "~/dev/openroute-mcp"
-		},
-    "openroute-mcp-http": {
-			"url": "http://localhost:8888/mcp",
-			"type": "http"
-		},
-	}
+   "servers": {
+      "openroute-mcp": {
+         "type": "stdio",
+         "cwd": "~/dev/openroute-mcp",
+         "env": {
+            "OPENROUTESERVICE_API_KEY": "YOUR_API_KEY"
+         },
+         "command": "uv",
+         "args": [
+            "run",
+            "openroute-mcp",
+            "--stdio"
+         ]
+      },
+      "openroute-mcp-http": {
+         "url": "http://localhost:8888/mcp",
+         "type": "http"
+      },
+   }
 }
 ```
 

@@ -9,7 +9,7 @@ from mcp import ClientSession
 from mcp.client.streamable_http import streamablehttp_client
 
 
-async def main():
+async def main() -> None:
     mcp_url = "http://localhost:8888/mcp"
     async with (
         streamablehttp_client(mcp_url) as (

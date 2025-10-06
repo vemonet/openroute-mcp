@@ -1,0 +1,13 @@
+.DS_Store
+.vscode
+.env
+.venv
+dist/
+__pycache__/
+*.egg-info/
+.*_cache
+.coverage
+
+# Data
+data/
+nohup.out

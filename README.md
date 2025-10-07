@@ -37,7 +37,11 @@
     - `from_coordinates` (list[float]): Starting location as [longitude, latitude]
     - `from_coordinates` (list[float]): Destination location as [longitude, latitude]
     - `waypoints` (list[list[float]]): optional list of waypoints coordinates as [[lon, lat], ...]
-  - Returns: the route as a GPX string, and a resource file containing the route GPX (e.g. `route://foot-hiking-98.gpx`)
+  - Returns:
+    - the route as a GPX string
+    - a resource file containing the **route GPX** (e.g. `route://foot-hiking-98.gpx`)
+    - a resource file containing a **PNG image** visualization of the route (e.g. `route://foot-hiking-98.png`)
+    - a resource file containing a **HTML** interactive visualization of the route (e.g. `route://foot-hiking-98.html`) that can be directly opened with your browser
 - **📌 Search for Points of Interest** (POIs) in an area
   - Arguments:
     - `bounding_box_coordinates` (list[list[float]]): coordinates defining a bounding box as [[min_lon, min_lat], [max_lon, max_lat]]

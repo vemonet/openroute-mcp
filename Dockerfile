@@ -9,4 +9,4 @@ RUN pip install .
 
 ENV PYTHONUNBUFFERED='1'
 EXPOSE 8888
-ENTRYPOINT ["openroute-mcp"]
+ENTRYPOINT ["openroute-mcp", "--http"]

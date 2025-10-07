@@ -45,13 +45,13 @@ echo "OPENROUTESERVICE_API_KEY=YYY" > .env
 You can run the server in development:
 
 ```sh
-uv run --env-file .env openroute-mcp
+uv run --env-file .env openroute-mcp --http
 ```
 
 Or with stdio:
 
 ```sh
-uv run --env-file .env openroute-mcp --stdio
+uv run --env-file .env openroute-mcp
 ```
 
 🔌 Connect a client to the MCP server (cf. `README.md` for more details), the VSCode `mcp.json` should look like below, you will need to change the `cwd` field to provide the path to this repository on your machine:
@@ -68,8 +68,7 @@ uv run --env-file .env openroute-mcp --stdio
          "command": "uv",
          "args": [
             "run",
-            "openroute-mcp",
-            "--stdio"
+            "openroute-mcp"
          ]
       },
       "openroute-mcp-http": {

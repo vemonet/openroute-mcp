@@ -23,7 +23,7 @@
 
 > [!TIP]
 >
-> Copy the whole GPX file returned as part of the tool call results, and use a service such as [gpx.studio](https://gpx.studio) to load the generated GPX file.
+> Copy the whole GPX file returned as part of the tool call results, and use a service such as [gpx.studio](https://gpx.studio) to load the generated GPX file on a map.
 
 ## 🛠️ Available tools
 
@@ -38,7 +38,12 @@
     - `from_coordinates` (list[float]): Destination location as [longitude, latitude]
     - `waypoints` (list[list[float]]): optional list of waypoints coordinates as [[lon, lat], ...]
   - Returns: the route as a GPX string, and a resource file containing the route GPX (e.g. `route://foot-hiking-98.gpx`)
-- **🔎 Search for known routes** close to a given start and end coordinates, this enables to suggest waypoints to go through known trails when creating a route.
+- **📌 Search for Points of Interest** (POIs) in an area
+  - Arguments:
+    - `bounding_box_coordinates` (list[list[float]]): coordinates defining a bounding box as [[min_lon, min_lat], [max_lon, max_lat]]
+    - `filters_name` (list[string]): optional list of names to filter POIs, e.g. ["Gas station", "Restaurant"]
+  - Returns: found POIs information
+- **🔎 Search for known routes** close to a given start and end coordinates, this enables to suggest waypoints to go through known trails when creating a route (only working in Switzerland for now).
   - Arguments:
     - `route_type` (string): Type of route, e.g. "driving-car", "cycling-mountain", "cycling-regular", "foot-hiking"
     - `from_coordinates` (list[float]): Starting location as [longitude, latitude]
@@ -63,35 +68,6 @@ For example, for [GitHub Copilot in VSCode](https://code.visualstudio.com/docs/c
 - [x] Open side panel chat (`ctrl+shift+i` or `cmd+shift+i`), and make sure the mode is set to `Agent` in the bottom right
 - [x] Open command palette (`ctrl+shift+p` or `cmd+shift+p`), and search for `MCP: Open User Configuration`, this will open a `mcp.json` file
 
-### 📡 Use streamable HTTP server
-
-Connect to a running streamable HTTP MCP server.
-
-In VSCode `mcp.json` you should have the following:
-
-```sh
-{
-  "servers": {
-    "openroute-mcp-http": {
-      "url": "http://localhost:8888/mcp",
-      "type": "http"
-    }
-  }
-}
-```
-
-> [!IMPORTANT]
->
-> Click on `Start` just on top of `"openroute-mcp"` to start the connection to the MCP server.
->
-> You can click the wrench and screwdriver button 🛠️ (`Select Tools...`) to enable/disable specific tools
-
-> [!CAUTION]
->
-> The routes created on a public MCP server will be publicly available to anyone.
-
-> More details available in [the VSCode MCP official docs](https://code.visualstudio.com/docs/copilot/chat/mcp-servers).
-
 ### ⌨️ Use stdio transport
 
 > [!IMPORTANT]
@@ -111,8 +87,7 @@ In VSCode `mcp.json` file you should have:
       "type": "stdio",
       "command": "uvx",
       "args": [
-        "openroute-mcp",
-        "--stdio"
+        "openroute-mcp"
       ],
       "env": {
         "OPENROUTESERVICE_API_KEY": "YOUR_API_KEY"
@@ -121,6 +96,35 @@ In VSCode `mcp.json` file you should have:
   }
 }
 ```
+
+> [!IMPORTANT]
+>
+> Click on `Start` just on top of `"openroute-mcp"` to start the connection to the MCP server.
+>
+> You can click the wrench and screwdriver button 🛠️ (`Configure Tools...`) to enable/disable specific tools
+
+### 📡 Use streamable HTTP server
+
+Connect to a running streamable HTTP MCP server.
+
+In VSCode `mcp.json` you should have the following:
+
+```sh
+{
+  "servers": {
+    "openroute-mcp-http": {
+      "url": "http://localhost:8888/mcp",
+      "type": "http"
+    }
+  }
+}
+```
+
+> [!CAUTION]
+>
+> The routes created on a public MCP server will be publicly available to anyone.
+
+> More details available in [the VSCode MCP official docs](https://code.visualstudio.com/docs/copilot/chat/mcp-servers).
 
 ## 🧑‍💻 Development
 

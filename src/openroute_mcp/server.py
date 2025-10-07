@@ -12,8 +12,8 @@ from mcp.server.session import ServerSession
 from mcp.types import BlobResourceContents, EmbeddedResource, TextResourceContents
 from pydantic import AnyUrl
 
-from openroute_mcp.types import LAYER_MAPPING, LocationResponse, LocationResult, PoisResponse, RouteType
-from openroute_mcp.utils import gpx_to_html, gpx_to_img, http_client
+from openroute_mcp.types import LAYER_MAPPING, LocationResponse, LocationResult, PoisResponse, RangeType, RouteType
+from openroute_mcp.utils import gpx_to_html, gpx_to_img, http_client, process_location_result
 
 # TODO: we could create URL to enable the user to visualize the GPX route
 # https://gpx.studio/?url=https://raw.githubusercontent.com/modelcontextprotocol/openroute-mcp/main/examples/route.gpx
@@ -66,36 +66,37 @@ async def search_location_coordinates(location: str) -> LocationResponse:
     results: list[LocationResult] = []
     # Get the top RESULTS_LIMIT best matches `data["features"][:SEARCH_LOCATION_RESULTS_LIMIT]`
     for i, feature in enumerate(data["features"], 1):
-        # Extract useful properties for description
-        props = feature.get("properties", {})
-        address = props.get("label", "")
-        if not address:
-            # Build full address components from available parts
-            address_parts = []
-            if props.get("housenumber"):
-                address_parts.append(props["housenumber"])
-            if props.get("street"):
-                address_parts.append(props["street"])
-            if props.get("locality"):
-                address_parts.append(props["locality"])
-            if props.get("region"):
-                address_parts.append(props["region"])
-            if props.get("country"):
-                address_parts.append(props["country"])
-            if address_parts:
-                address = ", ".join(address_parts)
+        results.append(process_location_result(feature, i))
+    return LocationResponse(results=results)
 
-        results.append(
-            LocationResult(
-                rank=i,
-                name=props.get("name", "Unknown"),
-                address=address,
-                longitude=feature["geometry"]["coordinates"][0],
-                latitude=feature["geometry"]["coordinates"][1],
-                confidence=props.get("confidence", 0),
-                layer=props.get("layer", ""),
-            )
-        )
+
+@mcp.tool()
+async def get_coordinates_object(lon: float, lat: float) -> LocationResponse:
+    """Returns the next enclosing objects with an address tag which surrounds the given coordinate.
+
+    Args:
+        lon: Longitude of the location
+        lat: Latitude of the location
+
+    Returns:
+        List of objects results close to the given coordinates
+    """
+    response = await http_client().get(
+        f"{OPENROUTE_API}/geocode/reverse",
+        params={
+            "api_key": OPENROUTESERVICE_API_KEY,
+            "point.lon": lon,
+            "point.lat": lat,
+        },
+    )
+    response.raise_for_status()
+    data = response.json()
+    if not data.get("features"):
+        raise ValueError(f"Could not reverse geocode location: [{lon}, {lat}]")
+
+    results: list[LocationResult] = []
+    for i, feature in enumerate(data["features"], 1):
+        results.append(process_location_result(feature, i))
     return LocationResponse(results=results)
 
 
@@ -200,6 +201,42 @@ async def create_route_from_to(
     # and include a resource link so the file can be downloaded.
     # https://modelcontextprotocol.io/specification/2025-06-18/server/tools#resource-links
     return tool_resp
+
+
+@mcp.tool()
+async def get_reachable_area(
+    coordinates_list: list[list[float]],
+    route_type: RouteType,
+    range_type: RangeType,
+    area_range: list[int] = [300, 200],  # noqa: B006
+) -> PoisResponse:
+    """Computes the area that can be reached within a given time or distance from one or more starting points.
+
+    Args:
+        coordinates_list: 1 or more coordinates to compute reachable area from as [[lon, lat], ...]
+        range: maximum range value of the analysis in seconds for time and metres for distance.
+            Or a comma separated list of specific range values
+
+    Returns:
+        Reachable area information in GeoJSON format
+    """
+    request_body = {
+        "locations": coordinates_list,
+        "range": area_range,
+        "range_type": range_type,
+    }
+    response = await http_client().post(
+        f"{OPENROUTE_API}/v2/isochrones/{route_type}",
+        headers={
+            "Authorization": OPENROUTESERVICE_API_KEY,
+            "Content-Type": "application/json; charset=utf-8",
+            "Accept": "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8",
+        },
+        json=request_body,
+    )
+    response.raise_for_status()
+    result: PoisResponse = response.json()
+    return result
 
 
 # https://openrouteservice.org/dev/#/api-docs/pois/post
@@ -328,12 +365,13 @@ async def search_public_swiss_api(lon: float, lat: float, swiss_layer: str, clie
 # https://lobehub.com/mcp/srinath1510-alltrails_mcp_server
 
 # 🌍 WikiLoc: no API, scraping possible
-# https://fr.wikiloc.com/wikiloc/map.do?sw=46.3810438458062%2C6.469573974609375&ne=46.7248003746672%2C6.92962646484375&page=1
+# https://en.wikiloc.com/wikiloc/map.do?sw=46.3810438458062%2C6.469573974609375&ne=46.7248003746672%2C6.92962646484375&page=1
 
 # 🧗 https://www.outdooractive.com/
 # API: https://developers.outdooractive.com/API-Reference/Data-API.html
 
-# Need to host postgresql + uvicorn app: https://github.com/waymarkedtrails/waymarkedtrails-api
+# 🌌 Waymarked Trails: Need to host postgresql + uvicorn app: https://github.com/waymarkedtrails/waymarkedtrails-api
+# https://github.com/waymarkedtrails/waymarkedtrails-backend
 
 # POST https://www.alltrails.com/api/alltrails/explore/v1/suggestions
 # {"query":"rochers de naye","limit":50}

@@ -1,6 +1,6 @@
-FROM python:3.12-slim-bookworm
-# FROM python:3.13-slim
+FROM python:3.13-slim
 # FROM python:3.13
+# FROM python:3.12-slim-bookworm
 
 WORKDIR /app
 COPY . /app/

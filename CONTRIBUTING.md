@@ -28,7 +28,7 @@ uv run pre-commit install
 **Login to [openrouteservice.org](https://openrouteservice.org/)** with GitHub, get an API key, and create a `.env` file:
 
 ```sh
-echo "OPENROUTESERVICE_API_KEY=YYY" > .env
+echo "OPENROUTESERVICE_API_KEY=YOUR_API_KEY" > .env
 ```
 
 > [!IMPORTANT]
@@ -42,19 +42,25 @@ echo "OPENROUTESERVICE_API_KEY=YYY" > .env
 
 ## ⚡️ Run the server
 
-You can run the server in development:
+You can run the server using **streamable HTTP** transport in development:
 
 ```sh
 uv run --env-file .env openroute-mcp --http
 ```
 
-Or with stdio:
+Or with **STDIO** transport:
 
 ```sh
 uv run --env-file .env openroute-mcp
 ```
 
-🔌 Connect a client to the MCP server (cf. `README.md` for more details), the VSCode `mcp.json` should look like below, you will need to change the `cwd` field to provide the path to this repository on your machine:
+🫆 Start the **MCP inspector**:
+
+```sh
+uv run --env-file .env mcp dev src/openroute_mcp/server.py
+```
+
+**🔌 Connect a client** to the MCP server (cf. `README.md` for more details), the VSCode `mcp.json` should look like below, you will need to change the `cwd` field to provide the path to this repository on your machine:
 
 ```json
 {
@@ -120,7 +126,7 @@ uv cache clean
 >
 > Get a PyPI API token at [pypi.org/manage/account](https://pypi.org/manage/account).
 
-Run the release script providing the type of version bump: `fix`, `minor`, or `major`
+Run the release script providing the version bump: `fix`, `minor`, or `major`
 
 ```sh
 .github/release.sh fix

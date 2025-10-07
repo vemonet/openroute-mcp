@@ -12,6 +12,11 @@ RouteType = Literal[
     "wheelchair",
 ]
 
+RangeType = Literal[
+    "time",
+    "distance",
+]
+
 # Map route types to Swiss Geo API layers
 LAYER_MAPPING: dict[str, str | None] = {
     "foot-walking": "all:ch.swisstopo.swisstlm3d-wanderwege",

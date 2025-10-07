@@ -4,6 +4,11 @@ import pytest
 
 from openroute_mcp.server import search_location_coordinates
 
+# async def test_mcp_client_call():
+#     client = MCPClient("python server.py")
+#     response = await client.call_tool("add_numbers", {"a": 5, "b": 7})
+#     assert response == 12
+
 
 @pytest.mark.asyncio
 async def test_search_location_coordinates() -> None:

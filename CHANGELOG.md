@@ -1,5 +1,16 @@
 # 🪵 Changelog
 
+## [0.0.2](https://github.com/vemonet/openroute-mcp/compare/v0.0.1..v0.0.2) - 2025-10-08
+
+### ⛰️ Features
+
+- Enable configuration through CLI arguments, improve `Dockerfile` - ([944e63c](https://github.com/vemonet/openroute-mcp/commit/944e63ce3c6b885f0d559ea5951575aa8e447574))
+- Add `--debug` flag to enable more debugging logs, fix API key check - ([8d7b52b](https://github.com/vemonet/openroute-mcp/commit/8d7b52b3e613bab537d89493a6b7464a9088a24b))
+
+### 🐛 Bug Fixes
+
+- Fix docker host - ([d17ae86](https://github.com/vemonet/openroute-mcp/commit/d17ae8620582ee835da50cebb8fccc055c0bb73d))
+
 ## [0.0.1](https://github.com/vemonet/openroute-mcp/tree/v0.0.1) - 2025-10-08
 
 ### ⛰️ Features

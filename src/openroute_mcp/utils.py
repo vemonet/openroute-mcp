@@ -70,8 +70,8 @@ def gpx_to_img(gpx_str: str, output_file: str) -> str:
     m = StaticMap(800, 600, url_template="http://a.tile.openstreetmap.org/{z}/{x}/{y}.png")
     m.add_line(Line(coords, "blue", 3))
     if coords:
-        m.add_marker(CircleMarker(coords[0], "green", 10))
-        m.add_marker(CircleMarker(coords[-1], "red", 10))
+        m.add_marker(CircleMarker(coords[0], "green", 10))  # Start
+        m.add_marker(CircleMarker(coords[-1], "red", 10))  # End
 
     # Render image and save to file
     img = m.render()

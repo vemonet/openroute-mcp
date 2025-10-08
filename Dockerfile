@@ -1,12 +1,14 @@
-FROM python:3.13-slim
-# FROM python:3.13
-# FROM python:3.12-slim-bookworm
+FROM ghcr.io/astral-sh/uv:python3.13-trixie-slim
+# https://docs.astral.sh/uv/guides/integration/docker
+# FROM python:3.13-slim
 
 WORKDIR /app
+
 COPY . /app/
 
-RUN pip install .
+RUN uv sync --frozen
+# RUN pip install .
 
 ENV PYTHONUNBUFFERED='1'
 EXPOSE 8888
-ENTRYPOINT ["openroute-mcp", "--http"]
+ENTRYPOINT ["uv", "run", "openroute-mcp", "--http"]

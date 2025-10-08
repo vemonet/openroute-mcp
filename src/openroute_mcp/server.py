@@ -3,6 +3,7 @@ import base64
 import json
 import os
 import uuid
+from dataclasses import dataclass
 from typing import Any
 from xml.dom.minidom import parseString
 
@@ -18,16 +19,6 @@ from openroute_mcp.utils import gpx_to_html, gpx_to_img, http_client, process_lo
 # TODO: we could create URL to enable the user to visualize the GPX route
 # https://gpx.studio/?url=https://raw.githubusercontent.com/modelcontextprotocol/openroute-mcp/main/examples/route.gpx
 # https://gpx.studio/
-
-# Get API key from environment variable
-OPENROUTESERVICE_API_KEY = os.getenv("OPENROUTESERVICE_API_KEY", "")
-if not OPENROUTESERVICE_API_KEY:
-    raise ValueError("OPENROUTESERVICE_API_KEY environment variable not set")
-
-OPENROUTE_API = "https://api.openrouteservice.org"
-SEARCH_LOCATION_RESULTS_LIMIT = 10
-GEN_ROUTES_FOLDER = "data/generated_routes"
-os.makedirs(GEN_ROUTES_FOLDER, exist_ok=True)
 
 # Create MCP server https://github.com/modelcontextprotocol/python-sdk
 mcp = FastMCP(
@@ -51,11 +42,11 @@ async def search_location_coordinates(location: str) -> LocationResponse:
         List of location results with coordinates, address, and metadata.
     """
     response = await http_client().get(
-        f"{OPENROUTE_API}/geocode/search",
+        f"{settings.openroute_api}/geocode/search",
         params={
-            "api_key": OPENROUTESERVICE_API_KEY,
+            "api_key": settings.openroute_api_key,
             "text": location,
-            "size": SEARCH_LOCATION_RESULTS_LIMIT,
+            "size": settings.search_results_limit,
         },
     )
     response.raise_for_status()
@@ -82,9 +73,9 @@ async def get_coordinates_object(lon: float, lat: float) -> LocationResponse:
         List of objects results close to the given coordinates
     """
     response = await http_client().get(
-        f"{OPENROUTE_API}/geocode/reverse",
+        f"{settings.openroute_api}/geocode/reverse",
         params={
-            "api_key": OPENROUTESERVICE_API_KEY,
+            "api_key": settings.openroute_api_key,
             "point.lon": lon,
             "point.lat": lat,
         },
@@ -108,7 +99,7 @@ async def create_route_from_to(
     from_coordinates: list[float],
     to_coordinates: list[float],
     waypoints: list[list[float]] | None = None,
-) -> list[str | EmbeddedResource]:
+) -> list[EmbeddedResource | str]:
     """Create a route from a starting location coordinates to a destination, optionally with waypoints.
 
     Args:
@@ -126,11 +117,11 @@ async def create_route_from_to(
     coordinates.append(to_coordinates)
 
     response = await http_client().post(
-        f"{OPENROUTE_API}/v2/directions/{route_type}/gpx",
+        f"{settings.openroute_api}/v2/directions/{route_type}/gpx",
         headers={
             "Content-Type": "application/json; charset=utf-8",
             "Accept": "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8",
-            "Authorization": OPENROUTESERVICE_API_KEY,
+            "Authorization": settings.openroute_api_key,
         },
         json={"coordinates": coordinates},
     )
@@ -143,100 +134,68 @@ async def create_route_from_to(
         pretty_xml = response.text
 
     route_filename = f"{route_type}-{uuid.uuid4()}"
-
-    # NOTE: store the generated route file to enable downloading it via a resource link later
     gpx_filename = f"{route_filename}.gpx"
-    with open(os.path.join(GEN_ROUTES_FOLDER, gpx_filename), "w", encoding="utf-8") as f:
-        f.write(pretty_xml)
-
     gpx_uri = AnyUrl(f"route:///{gpx_filename}")
+
     # Notify client of resource update https://github.com/modelcontextprotocol/python-sdk/#session-properties-and-methods
     await ctx.session.send_resource_updated(gpx_uri)
-
-    # Generate image for the route
-    img_filename = f"{route_filename}.png"
-    html_filename = f"{route_filename}.html"
-    img_filepath = gpx_to_img(response.text, img_filename)
-    html_filepath = gpx_to_html(response.text, html_filename)
-
-    tool_resp: list[str | EmbeddedResource] = [
-        pretty_xml,
+    tool_resp: list[EmbeddedResource | str] = [
+        "The generated route is provided as a GPX file, please us it to summarize the route to the user and provide details, e.g. by which remarkable places does it go through. ",
         EmbeddedResource(
             type="resource",
             resource=TextResourceContents(text=pretty_xml, uri=gpx_uri, mimeType="application/gpx+xml"),
         ),
     ]
-    if img_filepath:
-        img_uri = AnyUrl(f"route:///{img_filename}")
-        with open(img_filepath, "rb") as f:
-            img_binary = base64.b64encode(f.read()).decode("utf-8")
-        await ctx.session.send_resource_updated(img_uri)
-        tool_resp.append(
-            EmbeddedResource(
-                type="resource",
-                resource=BlobResourceContents(blob=img_binary, uri=img_uri, mimeType="image/png"),
-            ),
-        )
-    if html_filepath:
-        html_uri = AnyUrl(f"route:///{html_filename}")
-        with open(html_filepath) as f:
-            html_str = f.read()
-        await ctx.session.send_resource_updated(html_uri)
-        tool_resp.append(
-            EmbeddedResource(
-                type="resource",
-                resource=TextResourceContents(text=html_str, uri=html_uri, mimeType="text/html"),
-            ),
-        )
+
+    if not settings.no_save:
+        # NOTE: store the generated route file to enable downloading it via a resource link later
+        with open(os.path.join(settings.data_folder, gpx_filename), "w", encoding="utf-8") as f:
+            f.write(pretty_xml)
+        # Generate image and HTML for the route
+        img_filename = f"{route_filename}.png"
+        html_filename = f"{route_filename}.html"
+        img_filepath = gpx_to_img(response.text, img_filename)
+        html_filepath = gpx_to_html(response.text, html_filename)
+
+        # Add PNG image if generated
+        if not settings.no_img and img_filepath:
+            img_uri = AnyUrl(f"route:///{img_filename}")
+            await ctx.session.send_resource_updated(img_uri)
+            with open(img_filepath, "rb") as f:
+                img_binary = base64.b64encode(f.read()).decode("utf-8")
+            tool_resp[0] += " An image preview of the route is also provided."  # type: ignore
+            tool_resp.append(
+                EmbeddedResource(
+                    type="resource",
+                    resource=BlobResourceContents(blob=img_binary, uri=img_uri, mimeType="image/png"),
+                ),
+            )
+        # Add HTML interactive map if generated
+        if settings.add_html and html_filepath:
+            html_uri = AnyUrl(f"route:///{html_filename}")
+            await ctx.session.send_resource_updated(html_uri)
+            with open(html_filepath) as f:
+                html_str = f.read()
+            tool_resp[0] += (
+                " An interactive HTML map of the route is also provided (no need to read it, it contains the same info as the GPX)."  # type: ignore
+            )
+            tool_resp.append(
+                EmbeddedResource(
+                    type="resource",
+                    resource=TextResourceContents(text=html_str, uri=html_uri, mimeType="text/html"),
+                ),
+            )
+            # # https://modelcontextprotocol.io/specification/2025-06-18/server/tools#resource-links
+            # tool_resp.append(
+            #     ResourceLink(
+            #         type="resource_link",
+            #         uri=html_uri,
+            #         name=html_filename,
+            #         mimeType="text/html",
+            #     ),
+            # )
     await ctx.session.send_resource_list_changed()
-
-    # ResourceLink(
-    #     type="resource_link",
-    #     uri=AnyUrl(f"route://{html_filename}"),
-    #     name=html_filename,
-    #     mimeType="text/html",
-    # ),
-
-    # Return the whole pretty-printed GPX file to enable LLM to summarize the route,
-    # and include a resource link so the file can be downloaded.
-    # https://modelcontextprotocol.io/specification/2025-06-18/server/tools#resource-links
     return tool_resp
-
-
-@mcp.tool()
-async def get_reachable_area(
-    coordinates_list: list[list[float]],
-    route_type: RouteType,
-    range_type: RangeType,
-    area_range: list[int] = [300, 200],  # noqa: B006
-) -> PoisResponse:
-    """Computes the area that can be reached within a given time or distance from one or more starting points.
-
-    Args:
-        coordinates_list: 1 or more coordinates to compute reachable area from as [[lon, lat], ...]
-        range: maximum range value of the analysis in seconds for time and metres for distance.
-            Or a comma separated list of specific range values
-
-    Returns:
-        Reachable area information in GeoJSON format
-    """
-    request_body = {
-        "locations": coordinates_list,
-        "range": area_range,
-        "range_type": range_type,
-    }
-    response = await http_client().post(
-        f"{OPENROUTE_API}/v2/isochrones/{route_type}",
-        headers={
-            "Authorization": OPENROUTESERVICE_API_KEY,
-            "Content-Type": "application/json; charset=utf-8",
-            "Accept": "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8",
-        },
-        json=request_body,
-    )
-    response.raise_for_status()
-    result: PoisResponse = response.json()
-    return result
 
 
 # https://openrouteservice.org/dev/#/api-docs/pois/post
@@ -266,9 +225,9 @@ async def search_pois(
     if filters_name:
         request_body["filters"] = {"name": filters_name}
     response = await http_client().post(
-        f"{OPENROUTE_API}/pois",
+        f"{settings.openroute_api}/pois",
         headers={
-            "Authorization": OPENROUTESERVICE_API_KEY,
+            "Authorization": settings.openroute_api_key,
             "Content-Type": "application/json; charset=utf-8",
             "Accept": "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8",
         },
@@ -294,7 +253,7 @@ async def search_known_routes(route_type: RouteType, from_coordinates: list[floa
     Returns:
         Description of known routes close to the given coordinates
     """
-    # TODO: currently only works for Switzerland using Swiss Geo API, need to find other services for other countries
+    # NOTE: currently only works for Switzerland using Swiss Geo API, need to find other services for other countries
     # Check if coordinates are in Switzerland before calling Swiss API
     if not is_in_switzerland(from_coordinates[0], from_coordinates[1]) or not is_in_switzerland(
         to_coordinates[0], to_coordinates[1]
@@ -382,10 +341,52 @@ async def search_public_swiss_api(lon: float, lat: float, swiss_layer: str, clie
 # NOTE: search for campgrounds commercial MCP server: https://github.com/campertunity/mcp-server
 
 
+@mcp.tool()
+async def get_reachable_area(
+    coordinates_list: list[list[float]],
+    route_type: RouteType,
+    range_type: RangeType,
+    area_range: list[int] = [300, 200],  # noqa: B006
+) -> PoisResponse:
+    """Computes the area that can be reached within a given time or distance from one or more starting points.
+
+    Args:
+        coordinates_list: 1 or more coordinates to compute reachable area from as [[lon, lat], ...]
+        route_type: Type of route, e.g. "cycling-mountain", "cycling-regular", "foot-hiking", "driving-car"
+        range_type: Type of range, either `time` (in seconds) or `distance` (in metres)
+        area_range: maximum range value of the analysis in seconds for time and metres for distance.
+            Or a comma separated list of specific range values
+
+    Returns:
+        Reachable area information in GeoJSON format
+    """
+    request_body = {
+        "locations": coordinates_list,
+        "range": area_range,
+        "range_type": range_type,
+    }
+    response = await http_client().post(
+        f"{settings.openroute_api}/v2/isochrones/{route_type}",
+        headers={
+            "Authorization": settings.openroute_api_key,
+            "Content-Type": "application/json; charset=utf-8",
+            "Accept": "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8",
+        },
+        json=request_body,
+    )
+    response.raise_for_status()
+    # TODO: fix the type
+    result: PoisResponse = response.json()
+    return result
+
+
+# TODO: tool to help find trails around one specific location
+
+
 @mcp.resource("route://{filename}")
 def get_route(filename: str) -> bytes:
     """Get a generated route `.gpx`, `.png` or `.html` file by filename."""
-    with open(f"{GEN_ROUTES_FOLDER}/{filename}", "rb") as f:
+    with open(f"{settings.data_folder}/{filename}", "rb") as f:
         data = f.read()
     return data
 
@@ -402,12 +403,18 @@ def scenic_biking_route(from_location: str, to_location: str) -> str:
     return f"Create a mountain biking route from {from_location} to {to_location}, try to go through known pleasant trails, and pass by interesting points of interest on the way"
 
 
-# Create a direct hiking route between Montreux and Lausanne, Switzerland
-# I am searching for POIs around Chauderon, Lausanne
-# Create a hiking route between Montreux and Lausanne, Switzerland, stop by some interesting points of interest on the way
-# Create a hiking route between Montreux and Lausanne, going through Vevey and Puidoux, Switzerland
-# Create a route between Rochers de Naye and Col de Jaman, Switzerland
-# I am looking for the coordinates of Rochers de Naye in Switzerland
+@dataclass
+class AppSettings:
+    openroute_api: str = "https://api.openrouteservice.org"
+    openroute_api_key: str = os.getenv("OPENROUTESERVICE_API_KEY", "")
+    data_folder: str = "data/generated_routes"
+    search_results_limit: int = 10
+    no_save: bool = False
+    no_img: bool = False
+    add_html: bool = False
+
+
+settings = AppSettings()
 
 
 def cli() -> None:
@@ -417,8 +424,51 @@ def cli() -> None:
     )
     parser.add_argument("--http", action="store_true", help="Use Streamable HTTP transport")
     parser.add_argument("--port", type=int, default=8888, help="Port to run the server on")
-    # parser.add_argument("--no-save", action="store_true", help="Don't save generated routes to disk")
+    parser.add_argument(
+        "--openroute-api",
+        type=str,
+        default="https://api.openrouteservice.org",
+        help="OpenRouteService API URL (default: https://api.openrouteservice.org)",
+    )
+    parser.add_argument(
+        "--openroute-api-key",
+        type=str,
+        default="",
+        help="OpenRouteService API key (default: taken from env var OPENROUTESERVICE_API_KEY)",
+    )
+    parser.add_argument(
+        "--data-folder", type=str, default="data/generated_routes", help="Folder to save generated routes"
+    )
+    parser.add_argument(
+        "--no-save",
+        action="store_true",
+        help="Don't save generated routes to disk (also disable image and HTML generation)",
+    )
+    parser.add_argument(
+        "--no-img",
+        action="store_true",
+        help="Do not add PNG image visualization of the routes to the response (image not supported by all LLMs)",
+    )
+    parser.add_argument(
+        "--add-html",
+        action="store_true",
+        help="Add HTML interactive map for routes to the response (larger context used)",
+    )
     args = parser.parse_args()
+    settings.openroute_api = args.openroute_api
+    settings.data_folder = args.data_folder
+    settings.no_save = args.no_save
+    settings.no_img = args.no_img
+    settings.add_html = args.add_html
+    if args.openroute_api_key:
+        settings.openroute_api_key = args.openroute_api_key
+    os.makedirs(settings.data_folder, exist_ok=True)
+
+    # # Get API key from environment variable
+    # OPENROUTESERVICE_API_KEY = os.getenv("OPENROUTESERVICE_API_KEY", "")
+    # if not OPENROUTESERVICE_API_KEY:
+    #     raise ValueError("OPENROUTESERVICE_API_KEY environment variable not set")
+
     if args.http:
         mcp.settings.port = args.port
         mcp.settings.log_level = "INFO"
@@ -433,3 +483,10 @@ def cli() -> None:
 #     print("Server starting up...")
 #     yield
 #     print("Server shutting down...")
+
+# Create a direct hiking route between Montreux and Lausanne, Switzerland
+# I am searching for POIs around Chauderon, Lausanne
+# Create a hiking route between Montreux and Lausanne, Switzerland, stop by some interesting points of interest on the way
+# Create a hiking route between Montreux and Lausanne, going through Vevey and Puidoux, Switzerland
+# Create a route between Rochers de Naye and Col de Jaman, Switzerland
+# I am looking for the coordinates of Rochers de Naye in Switzerland

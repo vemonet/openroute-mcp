@@ -24,6 +24,13 @@
   - Arguments:
     - `location` (string): location to get coordinates for
   - Returns: list of 10 coordinates with available description to enable the agent figure out the right one
+- **🏠 Find possible locations** (addresses) for given coordinates.
+  - Arguments:
+    - `lon` (float): Longitude of the location
+    - `lat` (float): Latitude of the location
+
+  - Returns: list of objects close to the given coordinates
+
 - **🗺️ Create a route** from a starting location to a destination, optionally with waypoints
   - Arguments:
     - `route_type` (string): Type of route, e.g. "cycling-mountain", "cycling-regular", "foot-hiking", "driving-car"
@@ -31,7 +38,6 @@
     - `from_coordinates` (list[float]): Destination location as [longitude, latitude]
     - `waypoints` (list[list[float]]): optional list of waypoints coordinates as [[lon, lat], ...]
   - Returns:
-    - the route as a GPX string
     - a resource file containing the **route GPX** (e.g. `route://foot-hiking-98.gpx`)
     - a resource file containing a **PNG image** visualization of the route (e.g. `route://foot-hiking-98.png`)
     - a resource file containing a **HTML** interactive visualization of the route (e.g. `route://foot-hiking-98.html`) that can be directly opened with your browser
@@ -46,6 +52,15 @@
     - `from_coordinates` (list[float]): Starting location as [longitude, latitude]
     - `from_coordinates` (list[float]): Destination location as [longitude, latitude]
   - Returns: known trails trace and description when available to help the agent build a nice route
+- **⏱️ Computes the area that can be reached within a given time** or distance from one or more starting points.
+  - Arguments:
+    - `coordinates_list`: 1 or more coordinates to compute reachable area from as [[lon, lat], ...]
+    - `route_type`: Type of route, e.g. "cycling-mountain", "cycling-regular", "foot-hiking", "driving-car"
+    - `range_type`: Type of range, either `time` (in seconds) or `distance` (in metres)
+    - `area_range`: maximum range value of the analysis in seconds for time and metres for distance. Or a comma separated list of specific range values
+
+  - Returns: Reachable area information in GeoJSON format
+
 
 ## 🗃️ Available Resources
 
@@ -72,7 +87,7 @@ For example, for [GitHub Copilot in VSCode](https://code.visualstudio.com/docs/c
 > Login with GitHub to [openrouteservice.org](https://openrouteservice.org/) and get an API key that you can provide through the `OPENROUTESERVICE_API_KEY` environment variable.
 
 ```sh
-OPENROUTESERVICE_API_KEY=YYY uvx openroute-mcp --stdio
+OPENROUTESERVICE_API_KEY=YYY uvx openroute-mcp
 ```
 
 In VSCode `mcp.json` file you should have:
@@ -100,6 +115,29 @@ In VSCode `mcp.json` file you should have:
 >
 > You can click the wrench and screwdriver button 🛠️ (`Configure Tools...`) to enable/disable specific tools
 
+Full details of the CLI options:
+
+```sh
+usage: openroute-mcp [-h] [--http] [--port PORT] [--openroute-api OPENROUTE_API] [--openroute-api-key OPENROUTE_API_KEY]
+                     [--data-folder DATA_FOLDER] [--no-save] [--no-img] [--add-html]
+
+A Model Context Protocol (MCP) server for building routes using OpenRouteService.
+
+options:
+  -h, --help            show this help message and exit
+  --http                Use Streamable HTTP transport
+  --port PORT           Port to run the server on
+  --openroute-api OPENROUTE_API
+                        OpenRouteService API URL (default: https://api.openrouteservice.org)
+  --openroute-api-key OPENROUTE_API_KEY
+                        OpenRouteService API key (default: taken from env var OPENROUTESERVICE_API_KEY)
+  --data-folder DATA_FOLDER
+                        Folder to save generated routes
+  --no-save             Don't save generated routes to disk (also disable image and HTML generation)
+  --no-img              Do not add PNG image visualization of the routes to the response (image not supported by all LLMs)
+  --add-html            Add HTML interactive map for routes to the response (larger context used)
+```
+
 ### 📡 Use streamable HTTP server
 
 Connect to a running streamable HTTP MCP server.
@@ -125,4 +163,4 @@ In VSCode `mcp.json` you should have the following:
 
 ## 🧑‍💻 Development
 
-Checkout the [`CONTRIBUTING.md`](/CONTRIBUTING.md) page for more details on running in development and contributing.
+Checkout the [`CONTRIBUTING.md`](https://github.com/vemonet/openroute-mcp/blob/main/CONTRIBUTING.md) page for more details on running in development and contributing.

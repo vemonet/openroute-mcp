@@ -1,10 +1,10 @@
 services:
-  mcp:
+  openroute-mcp:
     build: .
     restart: unless-stopped
-    environment:
-      - VIRTUAL_HOST=openroute-mcp.vemonet.mooo.com
-      - LETSENCRYPT_HOST=openroute-mcp.vemonet.mooo.com
+    # environment:
+    #   - VIRTUAL_HOST=openroute-mcp.vemonet.mooo.com
+    #   - LETSENCRYPT_HOST=openroute-mcp.vemonet.mooo.com
     ports:
       - 8888:8888
     env_file:

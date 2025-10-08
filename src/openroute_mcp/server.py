@@ -26,7 +26,6 @@ mcp = FastMCP(
     dependencies=["mcp", "httpx"],
     instructions="Tools to help plan routes using https://openrouteservice.org, for activities such as hiking or mountain biking",
     website_url="https://github.com/vemonet/openroute-mcp",
-    debug=True,
     # lifespan=app_lifespan,
 )
 
@@ -455,6 +454,11 @@ def cli() -> None:
         action="store_true",
         help="Add HTML interactive map for routes to the response (larger context used)",
     )
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Enable debug mode (more logs)",
+    )
     args = parser.parse_args()
     settings.openroute_api = args.openroute_api
     settings.data_folder = args.data_folder
@@ -463,17 +467,15 @@ def cli() -> None:
     settings.add_html = args.add_html
     if args.openroute_api_key:
         settings.openroute_api_key = args.openroute_api_key
+    if not settings.openroute_api_key:
+        raise ValueError("OPENROUTESERVICE_API_KEY environment variable not set and --openroute-api-key not provided")
     os.makedirs(settings.data_folder, exist_ok=True)
-
-    # # Get API key from environment variable
-    # OPENROUTESERVICE_API_KEY = os.getenv("OPENROUTESERVICE_API_KEY", "")
-    # if not OPENROUTESERVICE_API_KEY:
-    #     raise ValueError("OPENROUTESERVICE_API_KEY environment variable not set")
 
     if args.http:
         mcp.settings.host = args.host
         mcp.settings.port = args.port
-        mcp.settings.log_level = "INFO"
+        mcp.settings.log_level = "DEBUG" if args.debug else "INFO"
+        mcp.settings.debug = args.debug
         mcp.run(transport="streamable-http")
     else:
         mcp.run()

@@ -4,7 +4,7 @@
 
 [![PyPI - Version](https://img.shields.io/pypi/v/openroute-mcp.svg?logo=pypi&label=PyPI&logoColor=silver)](https://pypi.org/project/openroute-mcp/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/openroute-mcp.svg?logo=python&label=Python&logoColor=silver)](https://pypi.org/project/openroute-mcp/)
-[![Tests](https://github.com/vemonet/openroute-mcp/actions/workflows/test.yml/badge.svg)](https://github.com/vemonet/openroute-mcp/actions/workflows/test.yml) [![Open in Spaces](https://huggingface.co/datasets/huggingface/badges/resolve/main/open-in-hf-spaces-sm-dark.svg)](https://huggingface.co/spaces/vemonet/openroute-mcp)
+[![Tests](https://github.com/vemonet/openroute-mcp/actions/workflows/test.yml/badge.svg)](https://github.com/vemonet/openroute-mcp/actions/workflows/test.yml)
 
 </div>
 

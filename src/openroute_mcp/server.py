@@ -423,6 +423,7 @@ def cli() -> None:
         description="A Model Context Protocol (MCP) server for building routes using OpenRouteService."
     )
     parser.add_argument("--http", action="store_true", help="Use Streamable HTTP transport")
+    parser.add_argument("--host", type=str, default="localhost", help="Host to run the server on")
     parser.add_argument("--port", type=int, default=8888, help="Port to run the server on")
     parser.add_argument(
         "--openroute-api",
@@ -470,6 +471,7 @@ def cli() -> None:
     #     raise ValueError("OPENROUTESERVICE_API_KEY environment variable not set")
 
     if args.http:
+        mcp.settings.host = args.host
         mcp.settings.port = args.port
         mcp.settings.log_level = "INFO"
         mcp.run(transport="streamable-http")

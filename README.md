@@ -4,7 +4,7 @@
 
 [![PyPI - Version](https://img.shields.io/pypi/v/openroute-mcp.svg?logo=pypi&label=PyPI&logoColor=silver)](https://pypi.org/project/openroute-mcp/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/openroute-mcp.svg?logo=python&label=Python&logoColor=silver)](https://pypi.org/project/openroute-mcp/)
-[![Tests](https://github.com/vemonet/openroute-mcp/actions/workflows/test.yml/badge.svg)](https://github.com/vemonet/openroute-mcp/actions/workflows/test.yml)
+[![Tests](https://github.com/vemonet/openroute-mcp/actions/workflows/test.yml/badge.svg)](https://github.com/vemonet/openroute-mcp/actions/workflows/test.yml) [![Open in Spaces](https://huggingface.co/datasets/huggingface/badges/resolve/main/open-in-hf-spaces-sm-dark.svg)](https://huggingface.co/spaces/vemonet/openroute-mcp)
 
 </div>
 
@@ -140,7 +140,7 @@ options:
 
 ### 📡 Use streamable HTTP server
 
-Connect to a running streamable HTTP MCP server.
+Connect to a running streamable HTTP MCP server, such as [openroute-mcp.onrender.com/mcp](https://openroute-mcp.onrender.com/mcp)
 
 In VSCode `mcp.json` you should have the following:
 
@@ -148,7 +148,7 @@ In VSCode `mcp.json` you should have the following:
 {
   "servers": {
     "openroute-mcp-http": {
-      "url": "http://localhost:8888/mcp",
+      "url": "https://openroute-mcp.onrender.com/mcp",
       "type": "http"
     }
   }

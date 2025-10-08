@@ -131,3 +131,16 @@ Run the release script providing the version bump: `fix`, `minor`, or `major`
 ```sh
 .github/release.sh fix
 ```
+
+> [!TIP]
+>
+> Add your PyPI token to your environment, e.g. in `~/.zshrc`:
+>
+> ```sh
+> export UV_PUBLISH_TOKEN=YOUR_TOKEN
+> ```
+
+MCP registry:
+
+- [Publishing a server docs](https://github.com/modelcontextprotocol/registry/blob/main/docs/guides/publishing/publish-server.md)
+- API: https://registry.modelcontextprotocol.io/docs

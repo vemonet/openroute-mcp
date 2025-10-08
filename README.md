@@ -1,5 +1,3 @@
-<div align="center">
-
 # 🗺️ OpenRoute MCP
 
 [![PyPI - Version](https://img.shields.io/pypi/v/openroute-mcp.svg?logo=pypi&label=PyPI&logoColor=silver)](https://pypi.org/project/openroute-mcp/)
@@ -96,7 +94,6 @@ In VSCode `mcp.json` file you should have:
 {
   "servers": {
     "openroute-mcp": {
-      "type": "stdio",
       "command": "uvx",
       "args": [
         "openroute-mcp"
@@ -164,3 +161,5 @@ In VSCode `mcp.json` you should have the following:
 ## 🧑‍💻 Development
 
 Checkout the [`CONTRIBUTING.md`](https://github.com/vemonet/openroute-mcp/blob/main/CONTRIBUTING.md) page for more details on running in development and contributing.
+
+<!-- mcp-name: io.github.vemonet/openroute-mcp -->

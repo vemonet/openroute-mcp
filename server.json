@@ -1,19 +1,18 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
   "name": "io.github.vemonet/openroute-mcp",
-  "title": "OpenRoute MCP",
-  "description": "Plan routes using openrouteservice.org, for activities such as hiking or mountain biking",
+  "description": "Plan routes using OpenRouteService API, for activities such as hiking or mountain biking",
   "repository": {
     "url": "https://github.com/vemonet/openroute-mcp",
     "source": "github"
   },
-  "version": "1.0.0",
+  "version": "0.0.3",
   "packages": [
     {
       "registryType": "pypi",
       "registryBaseUrl": "https://pypi.org",
       "identifier": "openroute-mcp",
-      "version": "1.0.0",
+      "version": "0.0.3",
       "transport": {
         "type": "stdio"
       },

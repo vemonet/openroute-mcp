@@ -1,7 +1,7 @@
 [project]
 requires-python = ">=3.10"
 name = "openroute-mcp"
-description = "MCP server to help plan routes using https://openrouteservice.org, for activities such as hiking or mountain biking."
+description = "MCP server to plan routes using OpenRouteService API, for activities such as hiking or mountain biking."
 readme = "README.md"
 license = { file = "LICENSE" }
 authors = [

@@ -6,7 +6,7 @@
 
 </div>
 
-[Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server to help plan routes using **[OpenRouteService.org](https://openrouteservice.org)**, for activities such as hiking or mountain biking.
+[Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server to plan routes using the **[OpenRouteService API](https://api.openrouteservice.org/)**, for activities such as hiking or mountain biking.
 
 > [!CAUTION]
 >

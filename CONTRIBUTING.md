@@ -140,7 +140,15 @@ Run the release script providing the version bump: `fix`, `minor`, or `major`
 > export UV_PUBLISH_TOKEN=YOUR_TOKEN
 > ```
 
-MCP registry:
+Update MCP registry entry:
 
-- [Publishing a server docs](https://github.com/modelcontextprotocol/registry/blob/main/docs/guides/publishing/publish-server.md)
-- API: https://registry.modelcontextprotocol.io/docs
+```sh
+brew install mcp-publisher
+mcp-publisher login github
+mcp-publisher publish
+```
+
+> [!NOTE]
+>
+> - [Publishing a server docs](https://github.com/modelcontextprotocol/registry/blob/main/docs/guides/publishing/publish-server.md)
+> - [Registry API docs](https://registry.modelcontextprotocol.io/docs)

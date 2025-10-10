@@ -1,5 +1,15 @@
 # 🪵 Changelog
 
+## [0.0.3](https://github.com/vemonet/openroute-mcp/compare/v0.0.2..v0.0.3) - 2025-10-10
+
+### ⛰️ Features
+
+- Add official mcp registry `server.json` config file - ([025f3c6](https://github.com/vemonet/openroute-mcp/commit/025f3c6664a3e43a67434caa8998785632a227e5))
+
+### 🛠️ Miscellaneous Tasks
+
+- Improve MCP registry `server.json` - ([2e7d2ab](https://github.com/vemonet/openroute-mcp/commit/2e7d2abb4e6a7896420acfcc8d5c92e584d56a83))
+
 ## [0.0.2](https://github.com/vemonet/openroute-mcp/compare/v0.0.1..v0.0.2) - 2025-10-08
 
 ### ⛰️ Features

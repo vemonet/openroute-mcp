@@ -3,6 +3,7 @@
 [![PyPI - Version](https://img.shields.io/pypi/v/openroute-mcp.svg?logo=pypi&label=PyPI&logoColor=silver)](https://pypi.org/project/openroute-mcp/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/openroute-mcp.svg?logo=python&label=Python&logoColor=silver)](https://pypi.org/project/openroute-mcp/)
 [![Tests](https://github.com/vemonet/openroute-mcp/actions/workflows/test.yml/badge.svg)](https://github.com/vemonet/openroute-mcp/actions/workflows/test.yml)
+[![MCP registry](https://img.shields.io/badge/MCP-Registry-green?logo=modelcontextprotocol)](https://vemonet.github.io/mcp-registry/?search=io.github.vemonet%2Fopenroute-mcp)
 
 </div>
 
@@ -26,9 +27,7 @@
   - Arguments:
     - `lon` (float): Longitude of the location
     - `lat` (float): Latitude of the location
-
   - Returns: list of objects close to the given coordinates
-
 - **🗺️ Create a route** from a starting location to a destination, optionally with waypoints
   - Arguments:
     - `route_type` (string): Type of route, e.g. "cycling-mountain", "cycling-regular", "foot-hiking", "driving-car"
@@ -58,7 +57,6 @@
     - `area_range`: maximum range value of the analysis in seconds for time and metres for distance. Or a comma separated list of specific range values
 
   - Returns: Reachable area information in GeoJSON format
-
 
 ## 🗃️ Available Resources
 

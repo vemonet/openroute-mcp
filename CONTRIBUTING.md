@@ -87,8 +87,6 @@ uv run --env-file .env mcp dev src/openroute_mcp/server.py
 
 ## ✅ Run tests
 
-Make sure the existing tests still work by running the test suite and linting checks. Note that any pull requests to the fairworkflows repository on github will automatically trigger running of the test suite;
-
 ```bash
 uv run --env-file .env pytest
 ```
@@ -140,15 +138,21 @@ Run the release script providing the version bump: `fix`, `minor`, or `major`
 > export UV_PUBLISH_TOKEN=YOUR_TOKEN
 > ```
 
-Update MCP registry entry:
+### 🗞️ Update the MCP Registry entry
+
+Setup [MCP publisher](https://github.com/modelcontextprotocol/registry/blob/main/docs/guides/publishing/publish-server.md):
 
 ```sh
 brew install mcp-publisher
 mcp-publisher login github
+```
+
+Update the 2 versions fields in the `server.json` file, then update MCP registry entry:
+
+```sh
 mcp-publisher publish
 ```
 
 > [!NOTE]
 >
-> - [Publishing a server docs](https://github.com/modelcontextprotocol/registry/blob/main/docs/guides/publishing/publish-server.md)
-> - [Registry API docs](https://registry.modelcontextprotocol.io/docs)
+> [Registry API docs](https://registry.modelcontextprotocol.io/docs)

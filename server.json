@@ -1,9 +1,9 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
   "name": "io.github.vemonet/openroute-mcp",
-  "description": "Plan routes using OpenRouteService API, for activities such as hiking or mountain biking",
+  "description": "Plan routes using the OpenRouteService API, such as for hiking, mountain biking, or driving.",
   "repository": {
-    "url": "https://github.com/vemonet/openroute-mcp",
+      "url": "https://github.com/vemonet/openroute-mcp",
     "source": "github"
   },
   "version": "0.0.3",
@@ -16,6 +16,17 @@
       "transport": {
         "type": "stdio"
       },
+      "runtimeHint": "uvx",
+      "runtimeArguments": [
+        {
+          "type": "named",
+          "description": "Port number for the server to listen on",
+          "isRequired": false,
+          "format": "number",
+          "defaultValue": 8000,
+          "name": "--port"
+        }
+      ],
       "environmentVariables": [
         {
           "description": "Your API key for https://api.openrouteservice.org",

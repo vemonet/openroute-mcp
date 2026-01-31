@@ -37,7 +37,7 @@
   - Returns:
     - a resource file containing the **route GPX** (e.g. `route://foot-hiking-98.gpx`)
     - a resource file containing a **PNG image** visualization of the route (e.g. `route://foot-hiking-98.png`)
-    - a resource file containing a **HTML** interactive visualization of the route (e.g. `route://foot-hiking-98.html`) that can be directly opened with your browser
+    - a resource file containing a **HTML** interactive visualization of the route (e.g. `ui://foot-hiking-98.html`) that can be directly opened with your browser
 - **📌 Search for Points of Interest** (POIs) in an area
   - Arguments:
     - `bounding_box_coordinates` (list[list[float]]): coordinates defining a bounding box as [[min_lon, min_lat], [max_lon, max_lat]]
@@ -114,7 +114,7 @@ Full details of the CLI options:
 
 ```sh
 usage: openroute-mcp [-h] [--http] [--port PORT] [--openroute-api OPENROUTE_API] [--openroute-api-key OPENROUTE_API_KEY]
-                     [--data-folder DATA_FOLDER] [--no-save] [--no-img] [--add-html]
+                     [--data-folder DATA_FOLDER] [--no-save] [--no-img] [--no-html]
 
 A Model Context Protocol (MCP) server for building routes using OpenRouteService.
 
@@ -130,31 +130,8 @@ options:
                         Folder to save generated routes
   --no-save             Don't save generated routes to disk (also disable image and HTML generation)
   --no-img              Do not add PNG image visualization of the routes to the response (image not supported by all LLMs)
-  --add-html            Add HTML interactive map for routes to the response (larger context used)
+  --no-html            Do not add HTML interactive map for routes to the response
 ```
-
-### 📡 Use streamable HTTP server
-
-Connect to a running streamable HTTP MCP server, such as [openroute-mcp.onrender.com/mcp](https://openroute-mcp.onrender.com/mcp)
-
-In VSCode `mcp.json` you should have the following:
-
-```sh
-{
-  "servers": {
-    "openroute-mcp-http": {
-      "url": "https://openroute-mcp.onrender.com/mcp",
-      "type": "http"
-    }
-  }
-}
-```
-
-> [!CAUTION]
->
-> The routes created on a public MCP server will be publicly available to anyone.
-
-> More details available in [the VSCode MCP official docs](https://code.visualstudio.com/docs/copilot/chat/mcp-servers).
 
 ## 🧑‍💻 Development
 

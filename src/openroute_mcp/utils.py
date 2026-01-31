@@ -101,10 +101,27 @@ def gpx_to_html(gpx_str: str, output_file: str) -> str:
     avg_lat = sum(lat for lat, _lon in route_points) / len(route_points)
     avg_lon = sum(lon for _lat, lon in route_points) / len(route_points)
 
-    m = folium.Map(location=[avg_lat, avg_lon], zoom_start=13, tiles="OpenStreetMap")
+    m = folium.Map(
+        location=[avg_lat, avg_lon],
+        zoom_start=13,
+        tiles="OpenStreetMap",
+        control_scale=True,
+        # height="800px",
+    )
     folium.PolyLine(route_points, color="blue", weight=5, opacity=0.8).add_to(m)  # type: ignore
     folium.Marker(route_points[0], tooltip="Start").add_to(m)
     folium.Marker(route_points[-1], tooltip="End").add_to(m)
+    #     # Add custom CSS for full height
+    #     css = """
+    # <style>
+    # * { box-sizing: border-box; margin: 0; padding: 0; }
+    # body {
+    #     height: 100vh !important;
+    #     min-height: 100vh !important;
+    # }
+    # </style>
+    # """
+    #     m.add_child(folium.Element(css))
     output_path = f"data/generated_routes/{output_file}"
     m.save(output_path)
     return output_path

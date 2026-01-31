@@ -170,14 +170,14 @@ async def create_route_from_to(
                 ),
             )
         # Add HTML interactive map if generated
-        if settings.add_html and html_filepath:
-            html_uri = AnyUrl(f"route:///{html_filename}")
+        if not settings.no_html and html_filepath:
+            html_uri = AnyUrl(f"ui:///{html_filename}")
             await ctx.session.send_resource_updated(html_uri)
             with open(html_filepath) as f:
                 html_str = f.read()
-            tool_resp[0] += (
-                " An interactive HTML map of the route is also provided (no need to read it, it contains the same info as the GPX)."  # type: ignore
-            )
+            # tool_resp[0] += (
+            #     " An interactive HTML map of the route is also provided (no need to read it, it contains the same info as the GPX)."  # type: ignore
+            # )
             tool_resp.append(
                 EmbeddedResource(
                     type="resource",
@@ -410,7 +410,7 @@ class AppSettings:
     search_results_limit: int = 10
     no_save: bool = False
     no_img: bool = False
-    add_html: bool = False
+    no_html: bool = False
 
 
 settings = AppSettings()
@@ -450,9 +450,9 @@ def cli() -> None:
         help="Do not add PNG image visualization of the routes to the response (image not supported by all LLMs)",
     )
     parser.add_argument(
-        "--add-html",
+        "--no-html",
         action="store_true",
-        help="Add HTML interactive map for routes to the response (larger context used)",
+        help="Do not add HTML interactive map for routes to the response (compatible with MCP apps)",
     )
     parser.add_argument(
         "--debug",
@@ -464,7 +464,7 @@ def cli() -> None:
     settings.data_folder = args.data_folder
     settings.no_save = args.no_save
     settings.no_img = args.no_img
-    settings.add_html = args.add_html
+    settings.no_html = args.no_html
     if args.openroute_api_key:
         settings.openroute_api_key = args.openroute_api_key
     if not settings.openroute_api_key:

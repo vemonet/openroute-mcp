@@ -66,7 +66,6 @@
   - Description: Returns a previously generated route file by filename.
   - Produced by: `create_route_from_to` tool
 
-
 ## 🔌 Connect client to MCP server
 
 Follow the instructions of your client, and use the `/mcp` URL of your deployed server (e.g. http://localhost:8888/mcp)

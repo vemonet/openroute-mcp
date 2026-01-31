@@ -1,5 +1,15 @@
 # 🪵 Changelog
 
+## [0.0.4](https://github.com/vemonet/openroute-mcp/compare/v0.0.3..v0.0.4) - 2026-01-31
+
+### ⛰️ Features
+
+- HTML route returned as MCP app - ([8c8f358](https://github.com/vemonet/openroute-mcp/commit/8c8f3580ea54c0f8b78217d7baf2bc9c8c6ba75f))
+
+### 📚 Documentation
+
+- Improve MCP `server.json` config - ([ab5e957](https://github.com/vemonet/openroute-mcp/commit/ab5e957017dc0ce90a4c1817179fd42a090c81a7))
+
 ## [0.0.3](https://github.com/vemonet/openroute-mcp/compare/v0.0.2..v0.0.3) - 2025-10-10
 
 ### ⛰️ Features

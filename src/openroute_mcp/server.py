@@ -122,7 +122,7 @@ async def create_route_from_to(
             "Accept": "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8",
             "Authorization": settings.openroute_api_key,
         },
-        json={"coordinates": coordinates},
+        json={"coordinates": coordinates, "elevation": True},
     )
     response.raise_for_status()
 
@@ -150,11 +150,15 @@ async def create_route_from_to(
         # NOTE: store the generated route file to enable downloading it via a resource link later
         with open(os.path.join(settings.data_folder, gpx_filename), "w", encoding="utf-8") as f:
             f.write(pretty_xml)
-        # Generate image and HTML for the route
+        # Generate image and HTML for the route (only when their flags are not disabled)
         img_filename = f"{route_filename}.png"
         html_filename = f"{route_filename}.html"
-        img_filepath = gpx_to_img(response.text, img_filename)
-        html_filepath = gpx_to_html(response.text, html_filename)
+        img_filepath = (
+            gpx_to_img(response.text, img_filename, settings.data_folder) if not settings.no_img else ""
+        )
+        html_filepath = (
+            gpx_to_html(response.text, html_filename, settings.data_folder) if not settings.no_html else ""
+        )
 
         # Add PNG image if generated
         if not settings.no_img and img_filepath:
@@ -346,7 +350,7 @@ async def get_reachable_area(
     route_type: RouteType,
     range_type: RangeType,
     area_range: list[int] = [300, 200],  # noqa: B006
-) -> PoisResponse:
+) -> dict[str, Any]:
     """Computes the area that can be reached within a given time or distance from one or more starting points.
 
     Args:
@@ -374,8 +378,9 @@ async def get_reachable_area(
         json=request_body,
     )
     response.raise_for_status()
-    # TODO: fix the type
-    result: PoisResponse = response.json()
+    # Isochrones return a GeoJSON FeatureCollection with polygon geometries —
+    # distinct from the POIs schema, so return the raw dict.
+    result: dict[str, Any] = response.json()
     return result
 
 

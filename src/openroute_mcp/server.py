@@ -122,7 +122,7 @@ async def create_route_from_to(
             "Accept": "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8",
             "Authorization": settings.openroute_api_key,
         },
-        json={"coordinates": coordinates},
+        json={"coordinates": coordinates, "elevation": True},
     )
     response.raise_for_status()
 

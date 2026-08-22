@@ -212,13 +212,11 @@ async def search_pois(
     Returns:
         Found POIs information
     """
+    # Search the whole bbox. Adding a `geojson` Point + `buffer` here made ORS
+    # search only a ~200m circle around the bbox corner, so results came back empty.
     request_body = {
         "request": "pois",
-        "geometry": {
-            "bbox": bounding_box_coordinates,
-            "geojson": {"type": "Point", "coordinates": bounding_box_coordinates[0]},
-            "buffer": 200,
-        },
+        "geometry": {"bbox": bounding_box_coordinates},
         "limit": 100,
     }
     if filters_name:
@@ -232,6 +230,13 @@ async def search_pois(
         },
         json=request_body,
     )
+    # ORS rejects bboxes above a per-instance area limit with code 4008. Surface a
+    # clear, actionable message instead of a bare HTTP 400.
+    if response.status_code == 400 and response.json().get("code") == 4008:
+        raise ValueError(
+            f"POI search area is too large for the ORS server: {response.json().get('message', '')} "
+            "Retry with a smaller bounding_box_coordinates (a box of ~0.04 x 0.03 degrees, ~10 km2, works reliably)."
+        )
     response.raise_for_status()
     result: PoisResponse = response.json()
     return result

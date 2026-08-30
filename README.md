@@ -30,10 +30,14 @@
   - Returns: list of objects close to the given coordinates
 - **🗺️ Create a route** from a starting location to a destination, optionally with waypoints
   - Arguments:
-    - `route_type` (string): Type of route, e.g. "cycling-mountain", "cycling-regular", "foot-hiking", "driving-car"
+    - `route_type` (string): Type of route, e.g. "cycling-mountain", "cycling-regular", "foot-hiking", "driving-car", "driving-hgv"
     - `from_coordinates` (list[float]): Starting location as [longitude, latitude]
     - `from_coordinates` (list[float]): Destination location as [longitude, latitude]
     - `waypoints` (list[list[float]]): optional list of waypoints coordinates as [[lon, lat], ...]
+    - `hgv_height` (float): optional vehicle height in meters, only used when `route_type` is `driving-hgv`
+    - `hgv_width` (float): optional vehicle width in meters, only used when `route_type` is `driving-hgv`
+    - `hgv_length` (float): optional vehicle length in meters, only used when `route_type` is `driving-hgv`
+    - `hgv_weight` (float): optional vehicle weight in tons, only used when `route_type` is `driving-hgv`
   - Returns:
     - a resource file containing the **route GPX** (e.g. `route://foot-hiking-98.gpx`)
     - a resource file containing a **PNG image** visualization of the route (e.g. `route://foot-hiking-98.png`)

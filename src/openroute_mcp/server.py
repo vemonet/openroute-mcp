@@ -98,14 +98,22 @@ async def create_route_from_to(
     from_coordinates: list[float],
     to_coordinates: list[float],
     waypoints: list[list[float]] | None = None,
+    hgv_height: float | None = None,
+    hgv_width: float | None = None,
+    hgv_length: float | None = None,
+    hgv_weight: float | None = None,
 ) -> list[EmbeddedResource | str]:
     """Create a route from a starting location coordinates to a destination, optionally with waypoints.
 
     Args:
-        route_type: Type of route, e.g. "driving-car", "cycling-mountain", "cycling-regular", "foot-hiking"
+        route_type: Type of route, e.g. "driving-car", "driving-hgv", "cycling-mountain", "cycling-regular", "foot-hiking"
         from_coordinates: Starting location as [longitude, latitude]
         to_coordinates: Destination location as [longitude, latitude]
         waypoints: optional list of waypoints coordinates as [[lon, lat], ...]
+        hgv_height: only used when route_type is "driving-hgv", vehicle height restriction in meters
+        hgv_width: only used when route_type is "driving-hgv", vehicle width restriction in meters
+        hgv_length: only used when route_type is "driving-hgv", vehicle length restriction in meters
+        hgv_weight: only used when route_type is "driving-hgv", vehicle weight restriction in tons
 
     Returns:
         GPX representation of the route
@@ -115,6 +123,25 @@ async def create_route_from_to(
         coordinates.extend(waypoints)
     coordinates.append(to_coordinates)
 
+    request_body: dict[str, Any] = {"coordinates": coordinates}
+    if route_type == "driving-hgv":
+        restrictions = {
+            k: v
+            for k, v in {
+                "height": hgv_height,
+                "width": hgv_width,
+                "length": hgv_length,
+                "weight": hgv_weight,
+            }.items()
+            if v is not None
+        }
+        if restrictions:
+            # https://giscience.github.io/openrouteservice/api-reference/endpoints/directions/routing-options
+            request_body["options"] = {
+                "vehicle_type": "hgv",
+                "profile_params": {"restrictions": restrictions},
+            }
+
     response = await http_client().post(
         f"{settings.openroute_api}/v2/directions/{route_type}/gpx",
         headers={
@@ -122,7 +149,7 @@ async def create_route_from_to(
             "Accept": "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8",
             "Authorization": settings.openroute_api_key,
         },
-        json={"coordinates": coordinates},
+        json=request_body,
     )
     response.raise_for_status()
 
